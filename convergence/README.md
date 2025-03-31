@@ -1,3 +1,5 @@
+# Convergence analysis
+
 1. [Purpose](Analysis of the automaton convergence time)
 
 2. [How to use the script]
