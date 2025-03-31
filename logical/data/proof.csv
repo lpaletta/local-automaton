@@ -1,0 +1,4 @@
+alg_name,K,n,error_bool,meas_error_bool,error_rate,positive,number_of_runs,T
+object,int64,int64,bool,bool,float64,int64,int64,int64
+Signal,9,9,True,True,0.001,10,162423040,1000
+Signal,35,35,True,True,0.01,12,570001920,1000
