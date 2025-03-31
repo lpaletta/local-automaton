@@ -1,15 +1,14 @@
 import sys
 import os
-import numpy as np
-import cProfile
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import numpy as np
 from sgn import SIGNAL
 from param import *
 from utils import *
 
-path_data = 'git/trajectory/data/'
+path_data = './trajectory/data/'
 
 K = 40
 param_dict["K"] = 40

@@ -9,7 +9,7 @@ def import_data(path,data_name,analysis_var):
     df["T"] = df["T"] + 1
     df['error_rate'] = df.apply(lambda x: np.around(x['error_rate'],4),axis=1)
 
-    if analysis_var in ["Logical","Proof","Correlation","Measurement"]:
+    if analysis_var in ["Logical","Proof","Convergence","Measurement"]:
         if analysis_var != "Proof":
             df = df[df["positive"]>=10]
             df = df[df["number_of_runs"]>=2.5*df["positive"]]
@@ -32,7 +32,7 @@ def import_data(path,data_name,analysis_var):
         df[["pL","sigma"]] = df[["pL","sigma"]].replace(0, float("NaN"))
         df = df[["alg_name","n","T","error_rate","pL","sigma","positive","number_of_runs"]]
 
-    elif analysis_var == "Correlation":
+    elif analysis_var == "Convergence":
         df = df.set_index(["alg_name","n","error_rate","T"]).unstack(fill_value=0).stack().reset_index()
         df[["pL","sigma"]] = df[["pL","sigma"]].replace(0, float("NaN"))
         df = df[["alg_name","n","T","error_rate","pL","sigma","positive","number_of_runs"]]

@@ -1,14 +1,14 @@
-import os
 import sys
+import os
 
-sys.path.append("/Users/lpaletta/Documents/INRIA/PhD/Cellular Automaton/Simulations/git")
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from import_data import *
 from analysis import *
 from plot import *
 
-path, data_name = "git/stack/data/", "data.csv"
-path_fig = "git/stack/fig/"
+path, data_name = "./stack/data/", "data.csv"
+path_fig = "./stack/fig/"
 
 df = import_data(path, data_name, "Stack")
 df = get_integral(df)

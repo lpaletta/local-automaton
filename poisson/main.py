@@ -1,12 +1,13 @@
 import sys
+import os
 
-sys.path.append("/Users/lpaletta/Documents/INRIA/PhD/Cellular Automaton/Simulations/git")
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from import_data import *
 from plot import *
 
-path, data_name = "git/poisson/data/", "data.csv"
-path_fig = "git/poisson/fig/"
+path, data_name = "./poisson/data/", "data.csv"
+path_fig = "./poisson/fig/"
 
 df = import_data(path, data_name, "Poisson")
 

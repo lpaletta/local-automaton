@@ -1,13 +1,14 @@
-import os
 import sys
-sys.path.append("/Users/lpaletta/Documents/INRIA/PhD/Cellular Automaton/Simulations/git")
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from import_data import *
 from fit import *
 from plot import *
 
-path, data_name, proof_name = "git/logical/data/", "data_without_shearing.csv", "proof.csv"
-path_fig = "git/logical/fig/"
+path, data_name, proof_name = "./logical/data/", "data_without_shearing.csv", "proof.csv"
+path_fig = "./logical/fig/"
 
 dict_pth_guess = {"Signal":0.08,
                 "Toom":0.08,
