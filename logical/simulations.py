@@ -7,7 +7,7 @@ from multiprocessing import Pool, cpu_count, freeze_support
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-path_output = "git/logical/out/"
+path_output = "repetition/logical/out/"
 
 from sgn import SIGNAL
 from toom import TOOM

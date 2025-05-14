@@ -38,10 +38,11 @@ option_sgn_dict = {
 }
 
 param_toom_dict = {
-    "init_data_array": np.array(())
+    "init_data_array": np.array(()),
 }
 
 option_toom_dict = {
+    "shuffling": ""
 }
 
 param_shearing_dict = {

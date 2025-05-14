@@ -3,6 +3,9 @@ from matplotlib.colors import LogNorm
 import matplotlib as mpl
 import numpy as np
 
+# use custom style
+plt.style.use('rgplot')
+
 khi_dict = {"9":0.59,
             "15":0.72,
             "25":0.67}
@@ -49,14 +52,16 @@ def plot_error_2D(df,n,fit_bool,bar_bool,path_fig):
         X_level = np.linspace(0,1,100)
         Y_level = (1+1/khi)*C-1/khi*X_level
         ax.plot(X_level,Y_level,color='black',linewidth=1.3,linestyle='dotted')
-        ax.text(0.42, 0.42, "$m={}$".format(round(-1/khi,2)), color='black', fontsize=11, ha='center', va='center', transform=ax.transAxes,rotation=-360/(2*np.pi)*np.arctan(1/khi))
+        ax.text(0.4, 0.45, "$-m={}$".format(round(-1/khi,2)), color='black', fontsize=12, ha='center', va='center', transform=ax.transAxes,rotation=-360/(2*np.pi)*np.arctan(1/khi))
 
-    ax.text(0.92, 0.87, "$n={}$".format(n), color='black', fontsize=11, ha='right', va='center', transform=ax.transAxes)
+    ax.text(0.92, 0.87, "$n={}$".format(n), color='black', fontsize=12, ha='right', va='center', transform=ax.transAxes)
 
     ax.set_xticks([0.01,0.04])
     ax.set_yticks([0.01,0.02,0.03,0.04])
     ax.tick_params(axis='both', which='major', labelsize=11)
     ax.tick_params(axis='both', which='minor', labelsize=11)
+
+    ax.grid(False)
 
     if not fit_bool:
         if bar_bool:

@@ -5,10 +5,9 @@ import time
 import numpy as np
 from multiprocessing import Pool, cpu_count, freeze_support
 
-sys.path.append("/Users/lpaletta/Documents/INRIA/PhD/Cellular Automaton/Simulations/git")
-sys.path.append("/Users/lpaletta/Documents/INRIA/PhD/Cellular Automaton/Simulations/git/measurement")
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-path_output = "git/measurement/out/"
+path_output = "repetition/measurement/out/"
 
 from sgn import SIGNAL
 

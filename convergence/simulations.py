@@ -7,7 +7,7 @@ from multiprocessing import Pool, cpu_count, freeze_support
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-path_output = "git/correlation/out/"
+path_output = "repetition/correlation/out/"
 
 from sgn import SIGNAL
 import param as pm

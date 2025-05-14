@@ -3,6 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgb
 
+# use custom style
+plt.style.use('rgplot')
+
 grey = to_rgb("#D6D6D6")
 light_grey = to_rgb("#F1F1F1")
 
@@ -10,7 +13,8 @@ from scipy.interpolate import make_interp_spline, BSpline
 
 def plot_f_T(df,fit_bool,path_fig):
 
-    color_map = plt.get_cmap('tab10')
+    plt.gca().set_prop_cycle(plt.rcParams['axes.prop_cycle'])
+    colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
     df_plot = df.copy()
     df_plot = df_plot.dropna(subset="pL")
@@ -30,12 +34,12 @@ def plot_f_T(df,fit_bool,path_fig):
             if n == 35:
                 ax.errorbar(X,Y,yerr=S,capsize=1,markersize=2,fmt='o',color=grey,label="$n=%i$"%n)
             else:
-                ax.errorbar(X,Y,yerr=S,capsize=1,markersize=2,fmt='o',color=color_map(i),label="$n=%i$"%n)
+                ax.errorbar(X,Y,yerr=S,capsize=1,markersize=2,fmt='o',color=colors[i],label="$n=%i$"%n)
                 i+=1
 
             if fit_bool:
                 Y = group_n_subset["pL_fit"].to_numpy()
-                ax.plot(X,Y,linestyle="dotted",color=color_map(i))
+                ax.plot(X,Y,linestyle="dotted",color=colors[i])
 
         ax.set_xlim(0,200)
 
@@ -47,6 +51,8 @@ def plot_f_T(df,fit_bool,path_fig):
 
         ax.tick_params(axis='both', which='major', labelsize=7)
         ax.tick_params(axis='both', which='minor', labelsize=7)
+
+        ax.grid(False)
 
         fig.tight_layout(pad=0.1,w_pad=0.1, h_pad=0.1)
 
@@ -84,6 +90,8 @@ def plot_transient_f_n(df,path_fig):
     ax.tick_params(axis='both', which='minor', labelsize=7)
     ax.yaxis.set_label_position("right")
     ax.yaxis.tick_right()
+
+    ax.grid(False)
 
     fig.tight_layout(pad=0.1, w_pad=0.1, h_pad=0.1)
 

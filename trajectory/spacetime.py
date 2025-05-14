@@ -9,8 +9,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from param import *
 
-path_data = 'git/trajectory/data/'
-path_fig = 'git/trajectory/fig/'
+path_data = 'repetition/trajectory/data/'
+path_fig = 'repetition/trajectory/fig/'
 
 color_darkblue = to_rgb("#2E3192")
 color_blue = to_rgb("#0071BC")

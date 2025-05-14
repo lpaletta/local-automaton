@@ -19,6 +19,8 @@ def TOOM(param, option, view={"record_var" : "Standard"}):
     # Booleans for activation of different error types
     errors_bool = option["error_bool"]
     meas_error_bool = option["meas_error_bool"]
+    shuffling = option["shuffling"]
+    intensity = option["intensity"]
 
     # Boolean initial data configuration
     init_var = param["init_var"]
@@ -40,6 +42,7 @@ def TOOM(param, option, view={"record_var" : "Standard"}):
     # List of four Toom's directions for cyclic switching
     Tooms_direction_list = [(1,1),(1,-1),(-1,1),(-1,-1)]
     direction = Tooms_direction_list[0]
+    S = 0
 
     # Main simulation loop
     for t in range(T):
@@ -57,12 +60,38 @@ def TOOM(param, option, view={"record_var" : "Standard"}):
 
 ################################ Correction ###################################
 
-        # Switch correction direction periodically based on log-scaled time steps
-        direction = Tooms_direction_list[(t//np.ceil(np.log(L)).astype(int))%4]
-        new_correction_array = get_correction_non_periodic(syndrome_hor,syndrome_vert,direction)
+        if shuffling == "None":
+            # Switch correction direction periodically based on log-scaled time steps
+            direction = Tooms_direction_list[(t//np.ceil(np.log(L)).astype(int))%4]
+            new_correction_array = get_correction_non_periodic(syndrome_hor,syndrome_vert,direction)
+            # Apply correction to data array
+            data_array = (data_array + new_correction_array)%2
 
-        # Apply correction to data array
-        data_array = (data_array + new_correction_array)%2
+        elif shuffling in ["SN","SNA","SND","Global"]:
+
+            if t%2 == 0:
+                direction = Tooms_direction_list[(t//np.ceil(np.log(L)).astype(int))%4]
+                new_correction_array = get_correction_non_periodic(syndrome_hor,syndrome_vert,direction)
+
+                data_array = (data_array + new_correction_array)%2
+
+            elif t%2 == 1:
+                if shuffling == "SN":
+                    for i in range(intensity):
+                        data_array = SN(data_array,"None",S%4)
+                        S += 1
+                elif shuffling == "SNA":
+                    for i in range(intensity):
+                        data_array = SNA(data_array,"None",S%4)
+                        S += 1
+                elif shuffling == "SND":
+                    for i in range(intensity):
+                        data_array = SND(data_array,"None",S%8)
+                        S += 1
+                elif shuffling == "Global":
+                    for i in range(intensity):
+                        data_array = Global(data_array,rng)
+                        S += 1
 
 ################################# Output ######################################
 

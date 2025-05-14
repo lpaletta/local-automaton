@@ -50,13 +50,13 @@ def SIGNAL(param, option, view={"record_var" : "Logical"}):
 
     # Initialize arrays for ASR or SSR
     if bidirectional_bool == True:
-        syndrome_array = np.zeros((2,L)).astype(np.int8)
+        defect_array = np.zeros((2,L)).astype(np.int8)
         forward_signal_array = np.zeros((2,L)).astype(np.int8)
         backward_signal_array = np.zeros((2,L)).astype(np.int8)
         anti_signal_array = np.zeros((2,L)).astype(np.int8)
         stack_array = np.zeros((2,L)).astype(np.int32)
     elif bidirectional_bool == False:
-        syndrome_array = np.zeros((1,L)).astype(np.int8)
+        defect_array = np.zeros((1,L)).astype(np.int8)
         forward_signal_array = np.zeros((1,L)).astype(np.int8)
         backward_signal_array = np.zeros((1,L)).astype(np.int8)
         anti_signal_array = np.zeros((1,L)).astype(np.int8)
@@ -76,31 +76,31 @@ def SIGNAL(param, option, view={"record_var" : "Logical"}):
 
 ############################### Measure Parities ###############################
 
-        syndrome_array = get_syndrome(bidirectional_bool,data_array,meas_error_bool,meas_error_rate,rng)
+        defect_array = get_defect(bidirectional_bool,data_array,meas_error_bool,meas_error_rate,rng)
 
 ################################## Update rules ################################
         
         # Track system history if trajectory recording is enabled
         if record_var == "Trajectory":
-            global_hist_array = update_global_hist(data_array,syndrome_array,forward_signal_array,backward_signal_array,anti_signal_array,stack_array,global_hist_array)
+            global_hist_array = update_global_hist(data_array,defect_array,forward_signal_array,backward_signal_array,anti_signal_array,stack_array,global_hist_array)
 
         # Instantaneous correction
-        instantaneous_correction_array = get_instantaneous_correction(bidirectional_bool,syndrome_array)
-        data_array, syndrome_array = (data_array + instantaneous_correction_array)%2, (syndrome_array + get_syndrome(bidirectional_bool,instantaneous_correction_array,False,0,rng))%2
+        instantaneous_correction_array = get_instantaneous_correction(bidirectional_bool,defect_array)
+        data_array, defect_array = (data_array + instantaneous_correction_array)%2, (defect_array + get_defect(bidirectional_bool,instantaneous_correction_array,False,0,rng))%2
 
-        # Syndrome deactivation
-        desactivated_syndrome_array = get_desactivated_syndrome(bidirectional_bool,syndrome_array)
+        # defect deactivation
+        desactivated_defect_array = get_desactivated_defect(bidirectional_bool,defect_array)
 
         # Forward signal propagation and stack updates
-        forward_signal_array,stack_array = send_forward_signal((syndrome_array+desactivated_syndrome_array)%2,forward_signal_array,stack_array)
+        forward_signal_array,stack_array = send_forward_signal((defect_array+desactivated_defect_array)%2,forward_signal_array,stack_array)
         forward_signal_array = propagate_signals(bidirectional_bool,forward_signal_array,1)
         if record_var == "Stack":
             max_stack = int(np.max(stack_array))
             stack_distribution_array[max_stack] += 1
 
         # Final correction step
-        final_correction_array,forward_signal_array,backward_signal_array = correction(syndrome_array,forward_signal_array,backward_signal_array,bidirectional_bool)
-        data_array, syndrome_array = (data_array+final_correction_array)%2, (syndrome_array + get_syndrome(bidirectional_bool,final_correction_array,False,0,rng))%2
+        final_correction_array,forward_signal_array,backward_signal_array = correction(defect_array,forward_signal_array,backward_signal_array,bidirectional_bool)
+        data_array, defect_array = (data_array+final_correction_array)%2, (defect_array + get_defect(bidirectional_bool,final_correction_array,False,0,rng))%2
 
         # Backward signal propagation and recombination
         for k in range(backward_signal_velocity):
@@ -109,7 +109,7 @@ def SIGNAL(param, option, view={"record_var" : "Logical"}):
             backward_signal_array,stack_array = recombine_stack(backward_signal_array,stack_array)
 
         # Anti-signal propagation and recombination
-        anti_signal_array,stack_array = send_anti_signal(syndrome_array,anti_signal_array,stack_array)
+        anti_signal_array,stack_array = send_anti_signal(defect_array,anti_signal_array,stack_array)
 
         for k in range(anti_signal_velocity-1):
             anti_signal_array = propagate_signals(bidirectional_bool,anti_signal_array,1)

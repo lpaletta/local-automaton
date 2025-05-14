@@ -7,8 +7,8 @@ from import_data import *
 from fit import *
 from plot import *
 
-path, data_name, proof_name = "./logical/data/", "data_without_shearing.csv", "proof.csv"
-path_fig = "./logical/fig/"
+path, data_name, proof_name = "repetition/logical/data/", "data.csv", "proof.csv"
+path_fig = "repetition/logical/fig/"
 
 dict_pth_guess = {"Signal":0.08,
                 "Toom":0.08,
@@ -20,7 +20,7 @@ for key in dict_plim_fit:
 
 df = import_data(path, data_name, "Logical")
 
-########## test ##########
+########## Test ##########
 
 for alg_name in list(set(df["alg_name"].to_list())):
     df_single_alg = df[df["alg_name"]==alg_name]
@@ -46,8 +46,6 @@ for alg_name in list(set(df["alg_name"].to_list())):
 df_algs_fit = pd.DataFrame()
 
 for alg_name in list(set(df["alg_name"].to_list())):
-    #if alg_name != "Signal":
-    #    break
     df_single_alg = df[df["alg_name"]==alg_name]
     df_single_alg_fit = fit_pL_single_alg(df_single_alg,dict_pth_guess[alg_name],dict_plim_fit[alg_name])
     df_algs_fit = pd.concat([df_algs_fit,df_single_alg_fit],ignore_index=True)
@@ -84,19 +82,17 @@ for alg_name in list(set(df["alg_name"].to_list())):
         n_reduced_list = [5,9,15,25,50,100]
     elif alg_name == "Shearing":
         n_reduced_list = [6,10,16,24,50,100]
+    elif alg_name == "Toom":
+        n_reduced_list = [9,16,25,49,100]
     else:
         n_reduced_list = list(set(df_single_alg["n"].to_list()))
 
-    if alg_name == "Harrington":
-        print(df_single_alg)
-
-    plot_f_n(df_single_alg[df_single_alg["error_rate"].isin(error_rate_reduced_list)],True,"pL_fit",dict_plim_fit[alg_name],path_fig_single_alg)
     plot_f_E(df_single_alg[df_single_alg["n"].isin(n_reduced_list)],True,"pL_fit",dict_plim_fit[alg_name],path_fig_single_alg)
 
 ######### plot gamma n #########
 
 plot_gamma_n(df,False,"gamma_n_fit",path_fig)
-plot_gamma_n(df,True,"gamma_n_fit",path_fig)
+#plot_gamma_n(df,True,"gamma_n_fit",path_fig)
 
 ######### plot logical estimated #########
 

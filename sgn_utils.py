@@ -4,40 +4,40 @@ def error_channel(h,L,error_rate,rng):
     new_errors_array = (rng.random((h,L)) < error_rate)
     return(new_errors_array.astype(np.int8))
 
-def get_syndrome(bidirectional_bool,data_array,meas_error_bool,meas_error_rate,rng):
+def get_defect(bidirectional_bool,data_array,meas_error_bool,meas_error_rate,rng):
     h, L = data_array.shape
-    syndrome_array = np.zeros((2 if bidirectional_bool else 1, L), dtype=np.int8)
+    defect_array = np.zeros((2 if bidirectional_bool else 1, L), dtype=np.int8)
 
-    # Compute syndrome array
-    base_syndrome = (data_array != np.roll(data_array, 1))
+    # Compute defect array
+    base_defect = (data_array != np.roll(data_array, 1))
     if meas_error_bool:
         # Add measurement error
-        base_syndrome = (base_syndrome + error_channel(h, L, meas_error_rate, rng)) % 2
+        base_defect = (base_defect + error_channel(h, L, meas_error_rate, rng)) % 2
 
-    syndrome_array[0, :] = base_syndrome
+    defect_array[0, :] = base_defect
     if bidirectional_bool:
-        # Add bidirectional syndrome for future simplified operations between numpy array
-        syndrome_array[1, :] = np.roll(base_syndrome, -1)
+        # Add bidirectional defect for future simplified operations between numpy array
+        defect_array[1, :] = np.roll(base_defect, -1)
 
-    return(syndrome_array)
+    return(defect_array)
 
-def get_instantaneous_correction(bidirectional_bool,syndrome_array):
-    L = syndrome_array.shape[1]
+def get_instantaneous_correction(bidirectional_bool,defect_array):
+    L = defect_array.shape[1]
     instantaneous_correction_array = np.zeros((1, L), dtype=np.int8)
 
     if not bidirectional_bool:
-        # Correction of (0,1,1) syndrome substrings
-        shifted_r = np.roll(syndrome_array[0, :], -1)
-        shifted_l = np.roll(syndrome_array[0, :], 1)
-        instantaneous_correction_array[0, :] = (shifted_l == 0) * syndrome_array[0, :] * shifted_r
+        # Correction of (0,1,1) defect substrings
+        shifted_r = np.roll(defect_array[0, :], -1)
+        shifted_l = np.roll(defect_array[0, :], 1)
+        instantaneous_correction_array[0, :] = (shifted_l == 0) * defect_array[0, :] * shifted_r
     else:
-        # Correction of (0,1,1) and (1,1,0) syndrome substrings
-        s0 = syndrome_array[0, :]
-        s1 = syndrome_array[1, :]
-        s0_r = np.roll(syndrome_array[0, :], -1)
-        s0_l = np.roll(syndrome_array[0, :], 1)
-        s1_r = np.roll(syndrome_array[1, :], -1)
-        s1_l = np.roll(syndrome_array[1, :], 1)
+        # Correction of (0,1,1) and (1,1,0) defect substrings
+        s0 = defect_array[0, :]
+        s1 = defect_array[1, :]
+        s0_r = np.roll(defect_array[0, :], -1)
+        s0_l = np.roll(defect_array[0, :], 1)
+        s1_r = np.roll(defect_array[1, :], -1)
+        s1_l = np.roll(defect_array[1, :], 1)
 
         instantaneous_correction_right_array = (s0_l == 0) * s0 * s0_r
         instantaneous_correction_left_array = s1_l * s1 * (s1_r == 0)
@@ -46,36 +46,36 @@ def get_instantaneous_correction(bidirectional_bool,syndrome_array):
 
     return(instantaneous_correction_array.astype(np.int8))
 
-def get_desactivated_syndrome(bidirectional_bool,syndrome_array):
+def get_desactivated_defect(bidirectional_bool,defect_array):
     # desactivated defects do not emit signals
-    desactivated_syndrome_array = np.zeros_like(syndrome_array)
+    desactivated_defect_array = np.zeros_like(defect_array)
 
     if bidirectional_bool == False:
-        desactivated_syndrome_array[0,:] = syndrome_array[0,:]*np.roll(syndrome_array[0,:],-1)
+        desactivated_defect_array[0,:] = defect_array[0,:]*np.roll(defect_array[0,:],-1)
     if bidirectional_bool == True:
-        s0_r = np.roll(syndrome_array[0,:],-1)
-        s1_l = np.roll(syndrome_array[1,:],1) 
-        desactivated_syndrome_array[0,:] = syndrome_array[0,:]*s0_r
-        desactivated_syndrome_array[1,:] = syndrome_array[1,:]*s1_l
+        s0_r = np.roll(defect_array[0,:],-1)
+        s1_l = np.roll(defect_array[1,:],1) 
+        desactivated_defect_array[0,:] = defect_array[0,:]*s0_r
+        desactivated_defect_array[1,:] = defect_array[1,:]*s1_l
 
-    return(desactivated_syndrome_array.astype(np.int8))
+    return(desactivated_defect_array.astype(np.int8))
 
-def send_forward_signal(syndrome_array,forward_signal_array,stack_array):
-    forward_signal_array, stack_array = (forward_signal_array + ((forward_signal_array==0)*syndrome_array))%2, stack_array + ((forward_signal_array==0)*syndrome_array)
+def send_forward_signal(defect_array,forward_signal_array,stack_array):
+    forward_signal_array, stack_array = (forward_signal_array + ((forward_signal_array==0)*defect_array))%2, stack_array + ((forward_signal_array==0)*defect_array)
     return(forward_signal_array.astype(np.int8),stack_array.astype(np.int32))
 
-def send_anti_signal(syndrome_array,anti_signal_array,stack_array):
-    anti_signal_array, stack_array = (anti_signal_array + (syndrome_array==0)*(anti_signal_array==0)*(stack_array>0))%2, stack_array-(syndrome_array==0)*(anti_signal_array==0)*(stack_array>0)
+def send_anti_signal(defect_array,anti_signal_array,stack_array):
+    anti_signal_array, stack_array = (anti_signal_array + (defect_array==0)*(anti_signal_array==0)*(stack_array>0))%2, stack_array-(defect_array==0)*(anti_signal_array==0)*(stack_array>0)
     return(anti_signal_array.astype(np.int8),stack_array.astype(np.int32))
 
-def correction(syndrome_array, forward_signal_array, backward_signal_array, bidirectional_bool):
-    h, L = syndrome_array.shape
+def correction(defect_array, forward_signal_array, backward_signal_array, bidirectional_bool):
+    h, L = defect_array.shape
 
     if not bidirectional_bool:
         final_correction_array = np.zeros((1,L))
         switch_signal_array = np.zeros((h, L), dtype=np.int8)
         
-        final_correction_array[0, :] = np.roll(syndrome_array[0, :] * forward_signal_array[0, :], -1)
+        final_correction_array[0, :] = np.roll(defect_array[0, :] * forward_signal_array[0, :], -1)
         switch_signal_array = ((np.roll(final_correction_array, 1) + np.roll(final_correction_array, 0))*forward_signal_array[0, :]*(backward_signal_array[0, :]==0))%2
         forward_signal_array[0, :], backward_signal_array[0, :] = (forward_signal_array[0, :] + switch_signal_array) % 2, (backward_signal_array[0, :] + switch_signal_array) % 2
 
@@ -85,8 +85,8 @@ def correction(syndrome_array, forward_signal_array, backward_signal_array, bidi
         correction_dual_array = np.zeros((h, L), dtype=np.int8)
         switch_signal_array = np.zeros((h, L), dtype=np.int8)
 
-        correction_array[0, :] = np.roll(syndrome_array[0, :] * forward_signal_array[0, :], -1)
-        correction_array[1, :] = np.roll(syndrome_array[1, :] * forward_signal_array[1, :], 1)
+        correction_array[0, :] = np.roll(defect_array[0, :] * forward_signal_array[0, :], -1)
+        correction_array[1, :] = np.roll(defect_array[1, :] * forward_signal_array[1, :], 1)
 
         correction_dual_array[0, :] = np.roll(correction_array[0, :], 1)
         correction_dual_array[1, :] = np.roll(correction_array[1, :], -1)

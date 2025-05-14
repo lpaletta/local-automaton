@@ -8,7 +8,7 @@ from sgn import SIGNAL
 from param import *
 from utils import *
 
-path_data = './trajectory/data/'
+path_data = 'repetition/trajectory/data/'
 
 K = 40
 param_dict["K"] = 40

@@ -4,9 +4,16 @@ import numpy as np
 import matplotlib.ticker as ticker
 from matplotlib.colors import to_rgb
 
+# use custom style
+plt.style.use('rgplot')
+
 grey = to_rgb("#D6D6D6")
 
 def plot_poisson(df,path_fig):
+
+    plt.gca().set_prop_cycle(plt.rcParams['axes.prop_cycle'])
+    colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+    i=0
 
     fig, ax = plt.subplots(1,1,figsize=(2.5,2))
     ax.scatter([],[],s=1,label=" ",color='w')
@@ -38,7 +45,10 @@ def plot_poisson(df,path_fig):
         if n == 35:
             ax.errorbar(X,Y,yerr=S,fmt="o",color=grey,capsize=1,markersize=2,label="n={}".format(n))
         else:
-            ax.errorbar(X,Y,yerr=S,fmt="o",capsize=1,markersize=2,label="n={}".format(n))
+            ax.errorbar(X,Y,yerr=S,fmt="o",color=colors[i],capsize=1,markersize=2,label="n={}".format(n))
+            i+=1
+
+
 
     ax.set_xlim([1,10**6])
     plt.xticks([1,100000,500000,1000000], 
@@ -53,8 +63,10 @@ def plot_poisson(df,path_fig):
     ax.tick_params(axis='both', which='minor', labelsize=7)
     ax.yaxis.set_minor_formatter(ticker.NullFormatter())
 
+    ax.grid(False)
+
     ax.set_xlabel("simulation time ($\\tau$)",fontsize=7,labelpad=0.5)
-    ax.set_ylabel("pop. in maj. 0 ($1-2 \\times P_L(\\tau)$)",fontsize=7,labelpad=0.5)
+    ax.set_ylabel("$1-2 \\times P_L(\\tau)$",fontsize=7,labelpad=0.5)
 
     ax.legend(loc="lower right",frameon=False,handletextpad=0.1,labelspacing=0.25,borderpad=0.25,fontsize=7,ncol=3,columnspacing=0.5)
 
